@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../css/budget.css" type="text/css">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../../css/all.min.css" type="text/css">
+</head>
+<style>
+    body {
+        background-image: url(../../images/ken-cheung-Kon-WFWUa-Auk-unsplash.jpg);
+        background-size: cover;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+</style>
+
+<body>
+    <div class="main">
+        <h1>this is edit budget page</h1>
+        <div class="add-expense-container mt-4 col-4">
+            <h4>Add Expense</h4>
+            <form method="post" action="/budget/editexpense">
+                <input type="hidden" name="budgid" id="id" value="<%= dataofexpense.id %>">
+                <div class="form-group">
+                    <label for="expense">Expense Title:</label>
+                    <input class="form-control" type="text" id="expense" name="title"
+                        value="<%= dataofexpense.title %>">
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount:</label>
+                    <input class="form-control" type="text" id="amount" name="price" value="<%= dataofexpense.price %>">
+                </div>
+                <button class="btn btn-primary form-control">Add Expense</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

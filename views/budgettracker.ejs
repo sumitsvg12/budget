@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/budget.css" type="text/css">
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/all.min.css" type="text/css">
+
+</head>
+
+<body>
+
+    <div>
+        <div class="main">
+            <h1>Budget Tracker System</h1>
+            <div class="budget-container row">
+                <div class="add-container col-4">
+                    <div class="add-budget-container">
+                        <h4>Add Budget</h4>
+                        <form method="post" action="/budget/insertincome">
+                            <div class="form-group">
+                                <label for="budget">Budget:</label>
+                                <input class="form-control" type="text" id="budget" name="income">
+                            </div>
+                            <button class="btn btn-primary form-control">Add Budget</button>
+                        </form>
+                    </div>
+                    <div class="add-expense-container mt-4">
+                        <h4>Add Expense</h4>
+                        <form method="post" action="/budget/insertexpense">
+                            <div class="form-group">
+                                <label for="expense">Expense Title:</label>
+                                <input class="form-control" type="text" id="expense" name="title">
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount:</label>
+                                <input class="form-control" type="text" id="amount" name="price">
+                            </div>
+                            <button class="btn btn-primary form-control">Add Expense</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="display-container col-4">
+                    <div style="display: flex;">
+                        <div class="alert" role="alert">
+                            <h2>income and total chart</h2>
+                            <div style="width: 290px;">
+                                <canvas id="budgetChart" height="300"></canvas>
+                                <button id="changeToBar" class="btn btn-primary">Bar Chart</button>
+                                <button id="changeToPie" class="btn btn-secondary">Pie Chart</button>
+                                <button id="changeToLine" class="btn btn-success">Line Chart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 display-container">
+                    <h2 class="mb-3">expense chart</h2>
+                    <div style="width: 300px;">
+                        <canvas id="myChart" height="300"></canvas>
+                    </div>
+                    <% var typeD=['line','bar','pie','doughnut','polarArea','radar',]%>
+                        <% typeD.map((v,i)=>{%>
+                            <button onclick="return setcharttype('<%= v %>')" class="btn btn-primary">
+                                <%= v %>
+                            </button>
+                            <%})%>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="main">
+        <h2>view Expensive data</h2>
+        <div class="display-container col-8">
+            <div class="heading coloum" style="display: flex; justify-content: space-around;">
+                <div class="alert alert-primary" role="alert">
+                    Total Budget: <span id="totalBudget">
+                        <%=incomeData?incomeData.income:0 %>
+                    </span>
+                </div>
+                <div class="alert alert-primary" role="alert">
+                    Total Expenses: <span id="totalExpenses">
+                        <%= expense %>
+                    </span>
+                </div>
+                <% var total=(incomeData?incomeData.income:0)-expense %>
+                    <div class="alert alert-primary" role="alert">
+                        Budget Left: <span id="budgetLeft">
+                            <%= total %>
+                        </span>
+                    </div>
+            </div>
+            <hr>
+            <div class="table-container table-responsive ">
+                <h5>Expense History:</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Expense Name</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <% expenseData.map((v,i)=>{%>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <%= v.title %>
+                                </td>
+                                <td>
+                                    <%= v.price %>
+                                </td>
+                                <td><a href="/budget/delectbudget/?budgid=<%= v.id %>"><button
+                                            class="btn btn-danger ">delete</button></a> ||
+                                    <a href="/budget/updatebudget/<%= v.id %>"> <button
+                                            class="btn btn-danger ">update</button></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <%})%>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="js/jquery.slim.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('myChart');
+
+        let labelN = '<%- JSON.stringify(labelnames)%>'
+        let labelP = '<%- JSON.stringify(labelprice)%>'
+
+        let myChart;
+        function setcharttype(typeD) {
+            myChart.destroy();
+            setcreatechart(typeD);
+        }
+        setcreatechart('pie')
+
+        function setcreatechart(typeD) {
+            myChart = new Chart(ctx, {
+                type: typeD,
+                data: {
+                    labels: JSON.parse(labelN),
+                    datasets: [{
+                        label: 'price of  expense',
+                        data: JSON.parse(labelP),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
+        // Data from your server-side code
+        const totalBudget = '<%= incomeData ? incomeData.income : 0 %>';
+        const totalExpenses = '<%= expense %>';
+        const budgetLeft = totalBudget - totalExpenses;
+
+        // Chart.js Configuration
+        const abc = document.getElementById('budgetChart').getContext('2d');
+        let currentChartType = 'bar'; // Default chart type
+
+        const budgetChartConfig = {
+            type: currentChartType,
+            data: {
+                labels: ['Total Budget', 'Total Expenses', 'Budget Left'],
+                datasets: [{
+                    label: 'Budget Overview',
+                    data: [totalBudget, totalExpenses, budgetLeft],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        // Create the initial chart
+        let budgetChart = new Chart(abc, budgetChartConfig);
+
+        // Function to Update Chart Type
+        function updateChartType(newType) {
+            budgetChart.destroy(); // Destroy the old chart
+            budgetChartConfig.type = newType; // Update the chart type
+            budgetChart = new Chart(abc, budgetChartConfig); // Recreate the chart
+        }
+
+        // Event Listeners for Buttons
+        document.getElementById('changeToBar').addEventListener('click', () => updateChartType('bar'));
+        document.getElementById('changeToPie').addEventListener('click', () => updateChartType('pie'));
+        document.getElementById('changeToLine').addEventListener('click', () => updateChartType('line'));
+    </script>
+
+
+
+</body>
+
+</html>
