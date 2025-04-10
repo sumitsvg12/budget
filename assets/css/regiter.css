@@ -118,3 +118,75 @@ input[type="submit"]:hover {
     text-decoration: underline;
 }
 
+/* Base styles (for larger screens) */
+.signin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .content {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 40px;
+    border-radius: 10px;
+    color: white;
+  }
+  
+  .table-form {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  /* Tablet screens */
+  @media screen and (max-width: 768px) {
+    .content {
+      padding: 30px;
+    }
+  
+    .table-form {
+      font-size: 16px;
+    }
+  
+    .table-form input[type="text"],
+    .table-form input[type="submit"] {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+  
+  /* Mobile screens */
+  @media screen and (max-width: 480px) {
+    .content {
+      padding: 20px;
+      margin: 0 10px;
+    }
+  
+    h1 {
+      font-size: 24px;
+      text-align: center;
+    }
+  
+    .table-form {
+      font-size: 14px;
+    }
+  
+    .table-form td {
+      display: block;
+      width: 100%;
+      padding: 5px 0;
+    }
+  
+    .table-form input[type="text"],
+    .table-form input[type="submit"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+    }
+  
+    .links {
+      text-align: center;
+      margin-top: 15px;
+    }
+  }
+  
